@@ -2,6 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { createSmooScroll } from './smoo-scroll';
+import { alignNativeScroll } from './align-native-scroll';
 
 export function useSmoothScroll(motion: boolean) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -9,6 +10,24 @@ export function useSmoothScroll(motion: boolean) {
   const contentRef = useRef<HTMLDivElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
   const instance = useRef<ReturnType<typeof createSmooScroll> | null>(null);
+  const alignmentFrame = useRef(0);
+  const cancelAlignment = useCallback(() => {
+    cancelAnimationFrame(alignmentFrame.current);
+    alignmentFrame.current = 0;
+  }, []);
+
+  useLayoutEffect(() => {
+    const events = ['wheel', 'touchstart', 'pointerdown', 'keydown'] as const;
+    events.forEach((event) =>
+      window.addEventListener(event, cancelAlignment, { passive: true }),
+    );
+    return () => {
+      cancelAlignment();
+      events.forEach((event) =>
+        window.removeEventListener(event, cancelAlignment),
+      );
+    };
+  }, [cancelAlignment]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -19,41 +38,49 @@ export function useSmoothScroll(motion: boolean) {
     const scroller = createSmooScroll(root, viewport, content, spacer);
     instance.current = scroller;
     return () => {
+      cancelAlignment();
       scroller.destroy();
       instance.current = null;
     };
-  }, [motion]);
+  }, [motion, cancelAlignment]);
 
   const getScrollY = useCallback(
     () => instance.current?.getScrollY() ?? window.scrollY,
     [],
   );
-  const cancelScroll = useCallback(() => instance.current?.cancelScroll(), []);
+  const cancelScroll = useCallback(() => {
+    cancelAlignment();
+    instance.current?.cancelScroll();
+  }, [cancelAlignment]);
   const exploreTo = useCallback(
-    (target: HTMLElement) => {
-      const resolveTop = () => {
-        const padding =
-          Number.parseFloat(
-            getComputedStyle(document.documentElement).scrollPaddingTop,
-          ) || 0;
-        const margin =
-          Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
-        return Math.max(
-          0,
-          target.getBoundingClientRect().top + getScrollY() - padding - margin,
-        );
-      };
+    (target: HTMLElement, resolveTarget?: () => number) => {
+      cancelAlignment();
+      const resolveTop =
+        resolveTarget ??
+        (() => {
+          const padding =
+            Number.parseFloat(
+              getComputedStyle(document.documentElement).scrollPaddingTop,
+            ) || 0;
+          const margin =
+            Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+          return Math.max(
+            0,
+            target.getBoundingClientRect().top +
+              getScrollY() -
+              padding -
+              margin,
+          );
+        });
       const focus = () => target.focus({ preventScroll: true });
       if (instance.current) instance.current.exploreTo(resolveTop, focus);
-      else {
-        window.scrollTo({ top: resolveTop(), behavior: 'instant' });
-        focus();
-      }
+      else alignNativeScroll(resolveTop, focus, alignmentFrame);
     },
-    [getScrollY],
+    [getScrollY, cancelAlignment],
   );
   const scrollTo = useCallback(
     (target: number | HTMLElement, immediate = false) => {
+      cancelAlignment();
       instance.current?.resize();
       const padding =
         Number.parseFloat(
@@ -70,7 +97,7 @@ export function useSmoothScroll(motion: boolean) {
         instance.current.scrollTo(Math.max(0, top), immediate);
       else window.scrollTo({ top: Math.max(0, top), behavior: 'instant' });
     },
-    [getScrollY],
+    [getScrollY, cancelAlignment],
   );
 
   return {

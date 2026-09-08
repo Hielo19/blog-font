@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { getHomeLandingTop } from '../features/blog/home-boundary.ts';
+import { alignNativeScroll } from '../features/scroll/align-native-scroll.ts';
 import {
   createSmooScroll,
   VISUAL_SCROLL_EVENT,
@@ -219,9 +221,70 @@ await test('explore click eases from rest and lands on the updated header offset
   f.frame(1190);
   assert.equal(f.scroller.getScrollY(), 880);
   assert.equal(f.win.scrollY, 880);
+  assert.equal(finished, 0);
+  // The header completes its layout after the last animation frame.
+  target = 875;
+  f.frame(1400);
+  assert.equal(f.scroller.getScrollY(), 875);
   assert.equal(f.root.dataset.smooJourney, undefined);
   assert.equal(finished, 1);
-  f.frame(1400);
+  f.frame(1500);
+  assert.equal(finished, 1);
+});
+
+await test('home landing tracks the scrim edge, visual scroll and changing navigation height', (t) => {
+  setup(t);
+  let visualY = 300;
+  let boundaryBottom = 800;
+  let headerBottom = 72;
+  let mounted = true;
+  const boundary = {
+    getBoundingClientRect: () => ({ bottom: boundaryBottom - visualY }),
+  };
+  document.getElementById = () => (mounted ? boundary : null);
+  Object.assign(document, {
+    querySelector: () => ({
+      getBoundingClientRect: () => ({ bottom: headerBottom }),
+    }),
+  });
+  assert.equal(getHomeLandingTop(visualY), 728);
+  visualY = 620;
+  assert.equal(getHomeLandingTop(visualY), 728);
+  boundaryBottom = 920;
+  headerBottom = 100;
+  assert.equal(getHomeLandingTop(visualY), 820);
+  boundaryBottom = 50;
+  assert.equal(getHomeLandingTop(visualY), 0);
+  mounted = false;
+  assert.equal(getHomeLandingTop(visualY), null);
+});
+
+await test('reduced motion corrects for the docked header before completing', (t) => {
+  const f = setup(t);
+  const frame = { current: 0 };
+  let top = 850;
+  let finished = 0;
+  alignNativeScroll(
+    () => top,
+    () => finished++,
+    frame,
+  );
+  assert.equal(f.win.scrollY, 850);
+  top = 884;
+  f.frame(16);
+  assert.equal(f.win.scrollY, 884);
+  assert.equal(finished, 0);
+  f.frame(32);
+  assert.equal(finished, 1);
+  assert.equal(frame.current, 0);
+
+  alignNativeScroll(
+    () => 500,
+    () => finished++,
+    frame,
+  );
+  cancelAnimationFrame(frame.current);
+  f.frame(48);
   assert.equal(finished, 1);
 });
 

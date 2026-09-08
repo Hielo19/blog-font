@@ -10,6 +10,7 @@ features/
     blog.module.css          博客界面样式，保留原有规则顺序
     components/              导航、首屏、个人卡片、说说、文章列表、阅读页
     hooks/use-blog-scene.ts   导航贴边与身份信息聚拢
+    home-boundary.ts          蒙板下沿与导航下沿的共享落点计算
     links.ts                 链接点击约定
   theme/use-appearance.ts    系统偏好、明暗切换和本地记忆
   scroll/                    滚动引擎及 React 生命周期适配

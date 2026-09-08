@@ -128,6 +128,7 @@ export function createSmooScroll(
     }
     const duration = Math.min(1250, Math.max(700, distance * 0.6 + 650));
     let started: number | null = null;
+    let finalChecks = 0;
     journeyActive = true;
     ignoreFocus = true;
     root.dataset.smooJourney = 'on';
@@ -145,7 +146,14 @@ export function createSmooScroll(
       });
       followScroll();
       notify();
-      if (t < 1) journeyFrame = requestAnimationFrame(advance);
+      // Allow the scene's next layout pass to finish docking the header before
+      // handing focus back. Bound retries if the document cannot scroll farther.
+      if (
+        t < 1 ||
+        (finalChecks++ < 3 &&
+          (finalChecks === 1 || Math.abs(resolveTop() - getScrollY()) > 0.5))
+      )
+        journeyFrame = requestAnimationFrame(advance);
       else {
         stopJourney();
         onComplete();

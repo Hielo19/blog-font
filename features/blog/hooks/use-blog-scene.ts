@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useState, type RefObject } from 'react';
 import { VISUAL_SCROLL_EVENT } from '@/features/scroll/smoo-scroll';
+import { getHomeLandingTop } from '../home-boundary';
 
 export function useBlogScene({
   article,
@@ -20,6 +21,7 @@ export function useBlogScene({
   useLayoutEffect(() => {
     let frame = 0;
     const dashboard = document.getElementById('dashboard-start');
+    const boundary = document.getElementById('home-boundary');
     const profile = document.getElementById('profile-card');
     const profileCore = document.getElementById('profile-core');
     const identity = document.getElementById('hero-identity');
@@ -31,21 +33,7 @@ export function useBlogScene({
       const viewportWidth = document.documentElement.clientWidth;
       const narrow = viewportWidth <= 700;
       const compact = viewportWidth <= 1050;
-      const scrollPadding = Number.parseFloat(
-        getComputedStyle(document.documentElement).scrollPaddingTop,
-      );
-      const scrollMargin = dashboard
-        ? Number.parseFloat(getComputedStyle(dashboard).scrollMarginTop)
-        : 48;
-      const dashboardTop = dashboard
-        ? dashboard.getBoundingClientRect().top + visualY
-        : window.innerHeight;
-      const travel = Math.max(
-        1,
-        dashboardTop -
-          (Number.isFinite(scrollPadding) ? scrollPadding : 74) -
-          (Number.isFinite(scrollMargin) ? scrollMargin : 48),
-      );
+      const travel = Math.max(1, getHomeLandingTop(visualY) ?? 1);
       const rawProgress = article
         ? 1
         : visualY >= travel - 1
@@ -198,10 +186,21 @@ export function useBlogScene({
       if (!frame) frame = requestAnimationFrame(measure);
     };
     measure();
+    const observer = new ResizeObserver(update);
+    [
+      boundary,
+      boundary?.parentElement,
+      dashboard,
+      profileCore,
+      previewRef.current?.querySelector('[data-smoo-header]'),
+    ].forEach((element) => {
+      if (element) observer.observe(element);
+    });
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener(VISUAL_SCROLL_EVENT, update);
     window.addEventListener('resize', update);
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener('scroll', update);
       window.removeEventListener(VISUAL_SCROLL_EVENT, update);

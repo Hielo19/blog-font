@@ -32,6 +32,7 @@ export function HeroIdentity() {
 export function Hero({ onExplore }: { onExplore: LinkAction }) {
   return (
     <section className={styles.hero} aria-labelledby="hero-title">
+      <div className={styles.heroScrim} id="home-boundary" aria-hidden="true" />
       <a className={styles.heroExplore} href="#journal" onClick={onExplore}>
         <span>向下浏览</span>
         <ArrowDown size={27} aria-hidden="true" />

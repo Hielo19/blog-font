@@ -21,6 +21,7 @@ import { Moment } from './components/moment';
 import { Journal } from './components/journal';
 import { ReadingPage } from './components/reading-page';
 import { useBlogScene } from './hooks/use-blog-scene';
+import { getHomeLandingTop } from './home-boundary';
 import { out, plainClick, type LinkAction } from './links';
 import styles from './blog.module.css';
 
@@ -275,7 +276,8 @@ export default function BlogExperience({ content }: { content: BlogContent }) {
     if (!plainClick(event)) return;
     event.preventDefault();
     const target = document.getElementById('dashboard-start');
-    if (target) exploreTo(target);
+    if (target)
+      exploreTo(target, () => getHomeLandingTop(getScrollY()) ?? getScrollY());
   };
   const onReturn: LinkAction = (event) => {
     if (plainClick(event)) {
