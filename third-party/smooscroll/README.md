@@ -7,8 +7,8 @@
 - Revision: `d302ef3c9cbb63b4eb3961f39b5edefcd4f8527f`
 - Upstream license: GNU GPL v3; full text in `LICENSE`.
 
-The local adaptation is `lib/smoo-scroll.ts`, integrated by
-`app/smooth-scroll.ts` and the page's explicitly rendered viewport/content/spacer.
+The local adaptation is `features/scroll/smoo-scroll.ts`, integrated by
+`features/scroll/use-smooth-scroll.ts` and the page's explicitly rendered viewport/content/spacer.
 It retains the upstream manual-lite mechanism (native scrollbar, matching
 document height, and translated content with a CSS transition) and the source's
 0.8 second / `.35, .73, .5, 1` timing, rather than the older defaults shown in
@@ -25,3 +25,5 @@ Local changes on 2026-09-08:
 - Native document flow when reduced motion is requested, and keyboard focus handling.
 
 The upstream global script is not loaded alongside this adaptation.
+
+- Guided explore clicks use a cancellable frame-based ease-in/out with synchronized native and visual positions; ordinary scrolling retains the upstream CSS follow behaviour.

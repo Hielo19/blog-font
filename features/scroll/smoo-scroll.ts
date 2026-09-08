@@ -20,6 +20,8 @@ export function createSmooScroll(
   let focusFrame = 0;
   let disposed = false;
   let ignoreFocus = false;
+  let journeyFrame = 0;
+  let journeyActive = false;
   const shifts = new WeakMap<HTMLElement, number>();
   const initialY = window.scrollY;
 
@@ -65,7 +67,7 @@ export function createSmooScroll(
   function tick() {
     frame = 0;
     if (disposed) return;
-    ignoreFocus = false;
+    if (!journeyActive) ignoreFocus = false;
     if (Math.abs(notify() - window.scrollY) > 0.05)
       frame = requestAnimationFrame(tick);
   }
@@ -85,6 +87,7 @@ export function createSmooScroll(
   }
 
   function scrollTo(top: number, immediate = false) {
+    stopJourney();
     resize();
     if (immediate) {
       ignoreFocus = true;
@@ -101,6 +104,73 @@ export function createSmooScroll(
 
   function cancelScroll() {
     scrollTo(getScrollY(), true);
+  }
+
+  function stopJourney() {
+    if (!journeyActive) return;
+    cancelAnimationFrame(journeyFrame);
+    journeyFrame = 0;
+    journeyActive = false;
+    delete root.dataset.smooJourney;
+    content.style.transition = SMOO_TRANSITION;
+  }
+
+  // A guided click moves both the native position and the visible content.
+  // Ordinary scrolling continues to use the upstream CSS follow behaviour.
+  function exploreTo(resolveTop: () => number, onComplete: () => void) {
+    cancelScroll();
+    cancelAnimationFrame(focusFrame);
+    const from = getScrollY();
+    const distance = Math.abs(resolveTop() - from);
+    if (distance < 1) {
+      onComplete();
+      return;
+    }
+    const duration = Math.min(1250, Math.max(700, distance * 0.6 + 650));
+    let started: number | null = null;
+    journeyActive = true;
+    ignoreFocus = true;
+    root.dataset.smooJourney = 'on';
+    content.style.transition = 'none';
+    const advance = (time: number) => {
+      if (!journeyActive || disposed) return;
+      started ??= time;
+      const t = Math.min(1, Math.max(0, (time - started) / duration));
+      // Zero velocity and acceleration at both ends avoids a kick or hard stop.
+      const eased = t * t * t * (10 + t * (-15 + 6 * t));
+      const top = resolveTop();
+      window.scrollTo({
+        top: from + (top - from) * eased,
+        behavior: 'instant',
+      });
+      followScroll();
+      notify();
+      if (t < 1) journeyFrame = requestAnimationFrame(advance);
+      else {
+        stopJourney();
+        onComplete();
+      }
+    };
+    journeyFrame = requestAnimationFrame(advance);
+  }
+
+  function onInput(event: Event) {
+    if (
+      event.type === 'keydown' &&
+      ![
+        'ArrowUp',
+        'ArrowDown',
+        'PageUp',
+        'PageDown',
+        'Home',
+        'End',
+        ' ',
+        'Escape',
+        'Tab',
+      ].includes((event as KeyboardEvent).key)
+    )
+      return;
+    stopJourney();
   }
 
   function onFocus(event: FocusEvent) {
@@ -135,22 +205,32 @@ export function createSmooScroll(
   if (header) observer.observe(header);
   window.addEventListener('scroll', followScroll, { passive: true });
   window.addEventListener('resize', resize);
+  window.addEventListener('wheel', onInput, { passive: true });
+  window.addEventListener('touchstart', onInput, { passive: true });
+  window.addEventListener('pointerdown', onInput, { passive: true });
+  window.addEventListener('keydown', onInput);
   content.addEventListener('focusin', onFocus);
 
   return {
     getScrollY,
     scrollTo,
     cancelScroll,
+    exploreTo,
     resize,
     destroy() {
       if (disposed) return;
       const visualY = getScrollY();
+      stopJourney();
       disposed = true;
       observer.disconnect();
       cancelAnimationFrame(frame);
       cancelAnimationFrame(focusFrame);
       window.removeEventListener('scroll', followScroll);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('wheel', onInput);
+      window.removeEventListener('touchstart', onInput);
+      window.removeEventListener('pointerdown', onInput);
+      window.removeEventListener('keydown', onInput);
       content.removeEventListener('focusin', onFocus);
       content
         .querySelectorAll<HTMLElement>('[data-smoo-sticky]')

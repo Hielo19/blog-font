@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useLayoutEffect, useRef } from 'react';
-import { createSmooScroll } from '@/lib/smoo-scroll';
+import { createSmooScroll } from './smoo-scroll';
 
 export function useSmoothScroll(motion: boolean) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -29,6 +29,29 @@ export function useSmoothScroll(motion: boolean) {
     [],
   );
   const cancelScroll = useCallback(() => instance.current?.cancelScroll(), []);
+  const exploreTo = useCallback(
+    (target: HTMLElement) => {
+      const resolveTop = () => {
+        const padding =
+          Number.parseFloat(
+            getComputedStyle(document.documentElement).scrollPaddingTop,
+          ) || 0;
+        const margin =
+          Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+        return Math.max(
+          0,
+          target.getBoundingClientRect().top + getScrollY() - padding - margin,
+        );
+      };
+      const focus = () => target.focus({ preventScroll: true });
+      if (instance.current) instance.current.exploreTo(resolveTop, focus);
+      else {
+        window.scrollTo({ top: resolveTop(), behavior: 'instant' });
+        focus();
+      }
+    },
+    [getScrollY],
+  );
   const scrollTo = useCallback(
     (target: number | HTMLElement, immediate = false) => {
       instance.current?.resize();
@@ -58,5 +81,6 @@ export function useSmoothScroll(motion: boolean) {
     getScrollY,
     scrollTo,
     cancelScroll,
+    exploreTo,
   };
 }

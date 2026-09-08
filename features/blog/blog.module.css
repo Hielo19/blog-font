@@ -3,7 +3,7 @@
   --header-top: 30px;
   --header-radius: 22px;
   --header-padding-x: 22px;
-  --header-min-height: 76px;
+  --header-min-height: 64px;
   --identity-x: 0px;
   --identity-y: 0px;
   --identity-scale: 1;
@@ -137,7 +137,7 @@
   justify-content: space-between;
   gap: 24px;
   min-height: var(--header-min-height);
-  padding: 14px var(--header-padding-x);
+  padding: 8px var(--header-padding-x);
   margin: 0;
   border-radius: var(--header-radius);
   background-color: var(--glass-header);
@@ -304,6 +304,12 @@
 .heroExplore:hover {
   transform: translateX(-50%) translateY(3px);
 }
+.preview[data-smoo-journey='on'] .heroExplore {
+  pointer-events: none;
+}
+.preview[data-smoo-journey='on'] .heroExplore svg {
+  animation-play-state: paused;
+}
 @keyframes heroArrow {
   0%,
   100% {
@@ -417,7 +423,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 16px;
+  padding: 7px 16px;
   color: var(--glass-secondary);
   font-size: 0.9rem;
   border: 1px solid transparent;
@@ -617,10 +623,11 @@
   display: grid;
   gap: 20px;
   min-width: 0;
-  scroll-margin-top: 92px;
 }
+.journal,
 .dashboard {
-  scroll-margin-top: 92px;
+  /* Root scroll padding already reserves the navigation height. */
+  scroll-margin-top: 48px;
 }
 .sectionHeading {
   position: relative;

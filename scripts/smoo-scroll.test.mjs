@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createSmooScroll, VISUAL_SCROLL_EVENT } from '../lib/smoo-scroll.ts';
+import {
+  createSmooScroll,
+  VISUAL_SCROLL_EVENT,
+} from '../features/scroll/smoo-scroll.ts';
 
 // A deterministic DOM boundary: CSS easing is supplied as an in-flight visual
 // position, allowing navigation and cleanup to be tested without timing races.
@@ -132,10 +135,10 @@ function setup(t) {
       visual = value;
     },
     disconnected: () => disconnected,
-    frame() {
+    frame(time = 0) {
       const callbacks = [...frames.values()];
       frames.clear();
-      callbacks.forEach((callback) => callback());
+      callbacks.forEach((callback) => callback(time));
     },
   };
 }
@@ -196,3 +199,72 @@ await test('turning smoothing off clears observers, animation frames and styles 
   assert.equal(f.content.style.transform, undefined);
 });
 
+await test('explore click eases from rest and lands on the updated header offset without a second CSS animation', (t) => {
+  const f = setup(t);
+  let target = 900;
+  let finished = 0;
+  f.scroller.exploreTo(
+    () => target,
+    () => finished++,
+  );
+  f.frame(0);
+  assert.equal(f.win.scrollY, 0);
+  assert.equal(f.content.style.transition, 'none');
+  f.frame(119);
+  assert.ok(f.win.scrollY > 0 && f.win.scrollY < 20);
+  f.frame(595);
+  assert.equal(f.win.scrollY, 450);
+  assert.equal(f.scroller.getScrollY(), 450);
+  target = 880;
+  f.frame(1190);
+  assert.equal(f.scroller.getScrollY(), 880);
+  assert.equal(f.win.scrollY, 880);
+  assert.equal(f.root.dataset.smooJourney, undefined);
+  assert.equal(finished, 1);
+  f.frame(1400);
+  assert.equal(finished, 1);
+});
+
+await test('manual input interrupts an explore click without jumping or stealing focus later', (t) => {
+  const f = setup(t);
+  let finished = false;
+  f.scroller.exploreTo(
+    () => 900,
+    () => {
+      finished = true;
+    },
+  );
+  f.frame(0);
+  f.frame(595);
+  f.win.dispatchEvent(new Event('wheel'));
+  f.frame(1190);
+  assert.equal(f.win.scrollY, 450);
+  assert.equal(f.root.dataset.smooJourney, undefined);
+  assert.equal(finished, false);
+});
+
+await test('navigation and cleanup cancel a guided click before restoring another page', (t) => {
+  const f = setup(t);
+  let finished = false;
+  f.scroller.exploreTo(
+    () => 900,
+    () => {
+      finished = true;
+    },
+  );
+  f.frame(0);
+  f.frame(595);
+  f.scroller.scrollTo(100, true);
+  f.frame(1400);
+  assert.equal(f.scroller.getScrollY(), 100);
+  assert.equal(finished, false);
+  f.scroller.exploreTo(
+    () => 700,
+    () => {
+      finished = true;
+    },
+  );
+  f.scroller.destroy();
+  assert.equal(f.frames.size, 0);
+  assert.equal(f.root.dataset.smooJourney, undefined);
+});

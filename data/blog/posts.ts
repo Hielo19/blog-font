@@ -1,18 +1,6 @@
-export type Post = {
-  slug: string;
-  title: string;
-  date: string;
-  dateKind: 'published' | 'updated';
-  category: string;
-  excerpt: string;
-  originalUrl: string;
-  cover: { src: string; alt: string; width: number; height: number };
-  pinned?: boolean;
-  paragraphs?: string[];
-  closing?: string;
-};
+import type { Post } from '@/models/blog';
+import { blogUrl } from '@/config/site';
 
-export const blogUrl = 'https://www.hielo.cn';
 export const recentPost: Post = {
   slug: 'recent-updates',
   title: '一些近况分享',
@@ -56,4 +44,3 @@ export const welcomePost: Post = {
   },
 };
 export const posts = [recentPost, welcomePost];
-export const displayDate = (date: string) => date.replaceAll('-', '.');
