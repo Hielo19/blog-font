@@ -1,0 +1,243 @@
+@import 'tailwindcss';
+
+/* Keep native scrollbars in the same theme as the page. */
+html,
+[data-hielo-theme] {
+  --scrollbar-thumb: rgba(70, 120, 115, 0.52);
+  --scrollbar-thumb-hover: rgba(54, 105, 101, 0.72);
+}
+
+html:has([data-hielo-theme='dark']),
+[data-hielo-theme='dark'] {
+  --scrollbar-thumb: rgba(156, 179, 194, 0.54);
+  --scrollbar-thumb-hover: rgba(156, 179, 194, 0.8);
+}
+
+/* Touch and forced-colour environments retain their native scrollbars. */
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  html,
+  [data-hielo-theme] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  /* Standards-compliant browsers keep their native thumb hover feedback. */
+  @supports not (scrollbar-width: thin) {
+    html::-webkit-scrollbar,
+    [data-hielo-theme]::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    html::-webkit-scrollbar-track,
+    html::-webkit-scrollbar-corner,
+    [data-hielo-theme]::-webkit-scrollbar-track,
+    [data-hielo-theme]::-webkit-scrollbar-corner {
+      background: transparent;
+      border: 0;
+    }
+
+    html::-webkit-scrollbar-thumb,
+    [data-hielo-theme]::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      border-radius: 999px;
+    }
+
+    html::-webkit-scrollbar-thumb:hover,
+    [data-hielo-theme]::-webkit-scrollbar-thumb:hover {
+      background-color: var(--scrollbar-thumb-hover);
+    }
+
+    html::-webkit-scrollbar-button,
+    [data-hielo-theme]::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+}
+
+/* Shared blog themes. */
+[data-hielo-theme] {
+  --glass-hue: 171;
+  --glass-accent: hsl(var(--glass-hue) 53% 29%);
+  --glass-text: hsl(var(--glass-hue) 22% 19%);
+  --glass-secondary: hsl(var(--glass-hue) 16% 30%);
+  --glass-muted: hsl(var(--glass-hue) 14% 37%);
+  --glass-edge: rgba(255, 255, 255, 0.44);
+  --glass-base: hsl(var(--glass-hue) 28% 92%);
+  --glass-surface: rgba(246, 249, 247, 0.5);
+  --glass-header: rgba(244, 248, 246, 0.46);
+  --glass-solid: rgba(245, 248, 246, 0.94);
+  --glass-overlay: rgba(240, 245, 242, 0.32);
+  --glass-paper: hsl(var(--glass-hue) 25% 98% / 0.97);
+  --glass-soft: hsl(var(--glass-hue) 38% 42% / 0.09);
+  --glass-hover: hsl(var(--glass-hue) 38% 42% / 0.15);
+  --glass-line: hsl(var(--glass-hue) 24% 35% / 0.16);
+  --glass-button: hsl(var(--glass-hue) 55% 83%);
+  --glass-button-hover: hsl(var(--glass-hue) 55% 76%);
+  --glass-button-ink: hsl(var(--glass-hue) 40% 20%);
+  --glass-shadow: rgba(42, 53, 48, 0.1);
+  --glass-reflection: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.02) 46%,
+    rgba(226, 250, 243, 0.07)
+  );
+  --glass-inset-light: rgba(255, 255, 255, 0.5);
+  --glass-inset-dark: rgba(65, 91, 84, 0.08);
+  --glass-float-shadow: 0 1px 10px rgba(255, 255, 255, 0.9);
+  --glass-small-surface: rgba(244, 249, 246, 0.66);
+  --glass-heading-scrim: radial-gradient(
+    ellipse at left,
+    rgba(239, 247, 244, 0.78),
+    rgba(239, 247, 244, 0.38) 48%,
+    transparent 76%
+  );
+  --glass-atmosphere: linear-gradient(
+    105deg,
+    rgba(240, 247, 243, 0.04),
+    transparent 55%,
+    rgba(228, 238, 233, 0.04)
+  );
+  --glass-vignette: linear-gradient(
+    0deg,
+    rgba(18, 30, 35, 0.06),
+    transparent 70%
+  );
+  color-scheme: light;
+}
+[data-hielo-theme='dark'] {
+  --glass-accent: #d1f3ed;
+  --glass-text: #fbfcfd;
+  --glass-secondary: #f0f3f5;
+  --glass-muted: #eaf0f2;
+  --glass-edge: rgba(255, 255, 255, 0.18);
+  --glass-base: #444d52;
+  --glass-surface: rgba(52, 59, 63, 0.55);
+  --glass-header: rgba(57, 62, 64, 0.49);
+  --glass-solid: rgba(58, 65, 69, 0.94);
+  --glass-overlay: rgba(24, 29, 32, 0.22);
+  --glass-paper: rgba(53, 61, 66, 0.97);
+  --glass-soft: rgba(226, 238, 234, 0.07);
+  --glass-hover: rgba(226, 238, 234, 0.13);
+  --glass-line: rgba(235, 242, 244, 0.14);
+  --glass-button: #bed9d5;
+  --glass-button-hover: #d7e9e4;
+  --glass-button-ink: #294742;
+  --glass-shadow: rgba(19, 24, 27, 0.15);
+  --glass-reflection: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.01) 46%,
+    rgba(201, 223, 228, 0.04)
+  );
+  --glass-inset-light: rgba(255, 255, 255, 0.14);
+  --glass-inset-dark: rgba(10, 17, 21, 0.12);
+  --glass-float-shadow: 0 1px 10px rgba(15, 20, 23, 0.78);
+  --glass-small-surface: rgba(54, 61, 65, 0.68);
+  --glass-heading-scrim: radial-gradient(
+    ellipse at left,
+    rgba(43, 50, 54, 0.7),
+    rgba(43, 50, 54, 0.34) 48%,
+    transparent 76%
+  );
+  --glass-atmosphere: linear-gradient(
+    105deg,
+    rgba(42, 50, 55, 0.06),
+    transparent 50%,
+    rgba(38, 43, 48, 0.08)
+  );
+  --glass-vignette: linear-gradient(
+    0deg,
+    rgba(24, 31, 35, 0.16),
+    transparent 70%
+  );
+  color-scheme: dark;
+}
+html[data-hielo-view-transition]::view-transition-old(root) {
+  animation: hielo-view-out 180ms ease both;
+}
+html[data-hielo-view-transition]::view-transition-new(root) {
+  animation: hielo-view-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hielo-view-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes hielo-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+html:has([data-hielo-motion='off']) {
+  scroll-behavior: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-hielo-view-transition]::view-transition-old(root),
+  html[data-hielo-view-transition]::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  scroll-padding-top: calc(var(--hielo-header-height, 76px) + 12px);
+}
+
+body {
+  margin: 0;
+  color: #263334;
+  background: #eef5f3;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid #49d1cc;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
