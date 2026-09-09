@@ -354,8 +354,7 @@
   transform: scale(0.96);
 }
 @media (hover: hover) and (pointer: fine) {
-  .feature:hover,
-  .welcome:hover {
+  .journalCard:has(a):hover {
     transform: translateY(-3px);
     box-shadow:
       inset 0 1px 0 var(--glass-inset-light),
@@ -369,14 +368,12 @@
     transform: rotate(-5deg) scale(1.04);
   }
 }
-.readMore svg,
-.textLink svg,
+.cardReadLink svg,
 .backLink svg,
 .quickLinks > a > svg {
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.readMore:hover svg,
-.textLink:hover svg {
+.cardReadLink:hover svg {
   transform: translateX(3px);
 }
 .backLink:hover svg {
@@ -676,179 +673,11 @@
   backdrop-filter: blur(14px) saturate(1.08);
   -webkit-backdrop-filter: blur(14px) saturate(1.08);
 }
-.feature {
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 49% minmax(0, 1fr);
-  min-height: 345px;
-}
-.featureImage {
-  position: relative;
-  min-width: 0;
-  overflow: hidden;
-  background: #153545;
-}
-.featureImage::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(4, 17, 30, 0.13) 65%,
-    rgba(9, 27, 43, 0.7)
-  );
-  pointer-events: none;
-}
-.featureImage img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  object-position: 48% center;
-  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.featureImage:hover img,
-.welcomeImage:hover img {
-  transform: scale(1.04);
-}
-.imageTag {
-  position: absolute;
-  z-index: 1;
-  left: 18px;
-  top: 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  color: #e1fff8;
-  background: rgba(6, 32, 43, 0.45);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(187, 255, 237, 0.3);
-  border-radius: 9px;
-  font-size: 0.75rem;
-}
-.imageTag > span {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #adffe3;
-}
-.imageCaption {
-  position: absolute;
-  bottom: 19px;
-  left: 20px;
-  z-index: 1;
-  font-size: 0.75rem;
-  color: #d8e8ed;
-  letter-spacing: 0.05em;
-}
-.featureCopy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 28px;
-  min-width: 0;
-}
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 13px;
-  font-size: 0.75rem;
-  color: var(--glass-muted);
-}
-.meta > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.meta > span:first-child {
-  color: var(--glass-accent);
-}
-.titleLink {
-  color: var(--glass-text);
-}
-.titleLink h3 {
-  margin: 14px 0 13px;
-  font-size: 1.72rem;
-  line-height: 1.4;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  transition: color 200ms;
-}
-.titleLink:hover h3 {
-  color: var(--glass-accent);
-}
-.featureCopy > p,
-.welcomeCopy > p {
-  margin: 0;
-  font-size: 1rem;
-  color: var(--glass-secondary);
-  line-height: 1.85;
-  white-space: pre-line;
-}
-.readMore {
-  display: inline-flex;
-  align-items: center;
-  gap: 20px;
-  margin-top: 26px;
-  padding: 10px 16px;
-  color: var(--glass-button-ink);
-  background: var(--glass-button);
-  border: 1px solid rgba(235, 255, 253, 0.35);
-  border-radius: 11px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition:
-    background 200ms,
-    gap 200ms;
-}
-.readMore:hover {
-  background: var(--glass-button-hover);
-  gap: 20px;
-}
-.welcome {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 33%;
-  overflow: hidden;
-  min-height: 214px;
-}
-.welcomeImage {
-  order: 2;
-  overflow: hidden;
-  background: #304459;
-}
-.welcomeImage img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  object-position: 36% center;
-  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.welcomeCopy {
-  padding: 24px 28px;
-  min-width: 0;
-}
-.welcomeCopy .titleLink h3 {
-  font-size: 1.38rem;
-  margin: 8px 0;
-}
-.welcomeCopy > p {
-  font-size: 0.9rem;
-  line-height: 1.75;
-}
-.textLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--glass-accent);
-  font-size: 0.875rem;
-  margin-top: 13px;
-}
 .quickLinks {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-column: 1 / -1;
+  gap: 16px;
 }
 .quickLinks > a {
   display: flex;
@@ -890,6 +719,137 @@
 .quickLinks > a > svg {
   margin-left: auto;
   color: var(--glass-muted);
+}
+.journalCards {
+  columns: 2;
+  column-gap: 20px;
+}
+.journalCard {
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+  break-inside: avoid;
+  margin: 0 0 20px;
+  padding: 22px;
+}
+.cardMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--glass-muted);
+}
+.cardCategory {
+  color: var(--glass-accent);
+  font-size: 0.875rem;
+}
+.cardDate,
+.cardBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.cardBadge,
+.exampleBadge {
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+.cardBadge {
+  color: var(--glass-accent);
+  background: var(--glass-soft);
+}
+.exampleBadge {
+  margin-left: auto;
+  color: var(--glass-muted);
+  border: 1px solid var(--glass-line);
+}
+.cardTitle {
+  margin: 14px 0;
+  color: var(--glass-text);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+}
+.cardTitle a {
+  color: inherit;
+  transition: color 200ms;
+}
+.cardTitle a:hover {
+  color: var(--glass-accent);
+}
+.cardExcerpt {
+  padding: 16px;
+  border-radius: 13px;
+  background: var(--glass-soft);
+  border: 1px solid var(--glass-edge);
+}
+.cardExcerpt p {
+  margin: 0;
+  color: var(--glass-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+.cardWithImage {
+  display: flow-root;
+}
+.cardThumbnail {
+  float: left;
+  width: 92px;
+  height: 100px;
+  margin: 3px 14px 7px 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.cardThumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 450ms ease;
+}
+a.cardThumbnail:hover img {
+  transform: scale(1.04);
+}
+.cardReadLink {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  width: fit-content;
+  margin: 15px 0 0 auto;
+  color: var(--glass-accent);
+  font-size: 0.875rem;
+}
+.cardReadLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+@media (max-width: 1050px) {
+  .journalCards {
+    columns: 1;
+  }
+}
+@media (max-width: 700px) {
+  .journalCard {
+    padding: 20px;
+    margin-bottom: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  a.cardThumbnail:hover img,
+  .journalCard:has(a):hover {
+    transform: none;
+  }
+}
+.preview[data-hielo-motion='off'] a.cardThumbnail:hover img {
+  transform: none;
+}
+.preview[data-hielo-motion='off'] .journalCard:has(a):hover {
+  transform: none;
 }
 .footer {
   display: flex;
@@ -1213,34 +1173,9 @@
     grid-template-columns: 240px minmax(0, 1fr);
     gap: 20px;
   }
-  .feature {
-    grid-template-columns: 1fr;
-  }
-  .featureImage {
-    aspect-ratio: 16/8;
-  }
-  .featureCopy {
-    padding: 24px;
-  }
-  .featureCopy .titleLink h3 {
-    margin-top: 9px;
-  }
-  .featureCopy > p {
-    white-space: normal;
-  }
-  .readMore {
-    margin-top: 18px;
-  }
   .quickLinks {
     grid-template-columns: 1fr;
     gap: 14px;
-  }
-  .welcome {
-    grid-template-columns: 1fr;
-  }
-  .welcomeImage {
-    order: 0;
-    aspect-ratio: 16/7;
   }
   .profile {
     padding: 21px;
@@ -1352,24 +1287,6 @@
   .sectionHeading > a {
     font-size: 0.8rem;
   }
-  .featureImage {
-    aspect-ratio: 16/9;
-  }
-  .featureCopy {
-    padding: 23px;
-  }
-  .titleLink h3 {
-    font-size: 1.6rem;
-  }
-  .welcome {
-    grid-template-columns: 1fr;
-  }
-  .welcomeImage {
-    aspect-ratio: 16/8;
-  }
-  .welcomeCopy {
-    padding: 23px;
-  }
   .quickLinks {
     grid-template-columns: 1fr;
   }
@@ -1400,10 +1317,6 @@
   transition: none !important;
   scroll-behavior: auto !important;
 }
-.preview[data-hielo-motion='off'] .feature:hover,
-.preview[data-hielo-motion='off'] .welcome:hover,
-.preview[data-hielo-motion='off'] .featureImage:hover img,
-.preview[data-hielo-motion='off'] .welcomeImage:hover img,
 .preview[data-hielo-motion='off'] .avatarRing:hover img,
 .preview[data-hielo-motion='off'] a:hover svg,
 .preview[data-hielo-motion='off'] button:hover,
@@ -1458,7 +1371,7 @@
   .modeToggle,
   .nav a,
   .brandIcon,
-  .readMore,
+  .cardExcerpt,
   .profileLink,
   .quickIcon,
   .sectionHeading > a,

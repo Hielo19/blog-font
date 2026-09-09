@@ -18,6 +18,7 @@ import { Header } from './components/header';
 import { Hero, HeroIdentity } from './components/hero';
 import { Profile } from './components/profile';
 import { Moment } from './components/moment';
+import { SidebarLinks } from './components/sidebar-links';
 import { Journal } from './components/journal';
 import { ReadingPage } from './components/reading-page';
 import { useBlogScene } from './hooks/use-blog-scene';
@@ -328,6 +329,7 @@ export default function BlogExperience({ content }: { content: BlogContent }) {
                 <aside className={styles.sidebar}>
                   <Profile />
                   <Moment />
+                  <SidebarLinks />
                   <a className={styles.originalLink} href={blogUrl} {...out}>
                     <Heart size={14} aria-hidden="true" />
                     我的原博客
